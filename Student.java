@@ -37,6 +37,14 @@ public class Student {
 
     }
 
+    public String getId(){
+        return this.id;
+    }
+
+    public String getEmail(){
+        return this.email;
+    }
+
     public Preference getLikesLoudMusic(){
         return this.likesLoudMusic;
     }
