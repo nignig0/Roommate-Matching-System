@@ -23,21 +23,15 @@ abstract public class Room {
     }
 
     public boolean addOccupant(Student student) {
-        // Get actual number of occupants
-        int occNum = 0;
-        for (var occ : occupants) {
-            if (occ != null) {
-                occNum++;
-                if (occ.getId().equals(student.getId()))
-                    return false;
-
-            }
-
+        // Check if the student is already in the room
+        for (Student occupant : occupants) {
+            if (occupant != null && occupant.getId().equals(student.getId()))
+                return false;
         }
 
         // If the actual number of occupants is equal to the
         // number of beds then the room is full and cannot be added to
-        if (occNum == numBeds)
+        if (getNumOccupants() == numBeds)
             return false;
 
         for (int i = 0; i < numBeds; i++) {
@@ -59,10 +53,11 @@ abstract public class Room {
         return false;
     }
 
-    public int getNumOccupants(){
+    public int getNumOccupants() {
         int numOccupants = 0;
-        for(int i = 0; i<occupants.length; ++i){
-            if(occupants[i] != null) numOccupants++;
+        for (int i = 0; i < occupants.length; ++i) {
+            if (occupants[i] != null)
+                numOccupants++;
         }
         return numOccupants;
     }
