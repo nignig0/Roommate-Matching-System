@@ -58,4 +58,12 @@ abstract public class Room {
         }
         return false;
     }
+
+    public int getNumOccupants(){
+        int numOccupants = 0;
+        for(int i = 0; i<occupants.length; ++i){
+            if(occupants[i] != null) numOccupants++;
+        }
+        return numOccupants;
+    }
 }

@@ -77,6 +77,18 @@ public class Student {
         this.matched = !matched;
     }
 
+    public int[] getPreferenceArray(){
+        return {
+        this.likesLoudMusic.ordinal(), 
+        this.likesHavingPeopleOver.ordinal(),
+        this.sleepsDeeply.ordinal(), 
+        this.likesTidySpace.ordinal(),
+        this.likesToSleepWithLightsOff.ordinal(), 
+        this.howMuchPersonalSpace.ordinal(),
+        this.offCampusOrOn.ordinal()
+        };
+    }
+ 
     public String toString(){
         String generalInformation = String.format("id: %s\ngender: %s\nemail: %s\nis student matched: %s\n", this.id, this.gender, this.email, this.matched);
 

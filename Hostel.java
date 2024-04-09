@@ -34,4 +34,14 @@ public class Hostel{
         return numFloors;
     }
 
+    public int getNumFreeBeds(){
+        int freeBeds = 0;
+        for(int i = 0; i<rooms.length; ++i){
+            for(int j = 0; j<rooms[i].length; ++j){
+                freeBeds += rooms[i][j].getNumBeds() - rooms[i][j].getNumOccupants();
+            }
+        }
+        return freeBeds;
+    }
+
 }
