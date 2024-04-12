@@ -69,4 +69,20 @@ abstract public class Room {
     public boolean isFull(){
         return getNumOccupants() == getNumBeds();
     }
+
+    public void display(){
+        System.out.printf("Room number: %s\n", this.roomNum);
+        System.out.println("-----------------");
+        for(int i = 0; i<occupants.length; i++){
+            if(occupants[i] == null){
+                System.out.println("Empty bed!");
+            }else{
+                System.out.printf("Bed %d\n", i+1);
+                System.out.printf("Student id: %s\n", occupants[i].getId());
+                System.out.printf("Student email: %s\n", occupants[i].getEmail());
+                System.out.println("--------------");
+            }
+
+        }
+    }
 }

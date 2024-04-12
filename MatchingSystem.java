@@ -232,7 +232,9 @@ public class MatchingSystem {
     }
 
     public void displayMatches() {
-
+        for(int i =0; i<hostels.length; i++){
+            hostels[i].displayRooms();
+        }
     }
 
     private void initHostels() {

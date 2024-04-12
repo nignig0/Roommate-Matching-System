@@ -1,7 +1,7 @@
 public class Hostel{
     //Declaring the instance variables of the hostel class
     private String name;
-    private int numRooms;
+    private int numRooms; //rooms per floor
     private Room[][] rooms;
     private boolean offCampus;
     private int numFloors;
@@ -46,6 +46,17 @@ public class Hostel{
 
     public boolean isOffCampus(){
         return this.offCampus;
+    }
+
+    public void displayRooms(){
+        System.out.printf("Hostel name: %s\n", name);
+        System.out.printf("Number of rooms: %d\n", numRooms*numFloors);
+        for(int i = 0; i< rooms.length; i++){
+            for(int j = 0; j<rooms[i].length; j++){
+                rooms[i][j].display();
+            }
+            
+        }
     }
 
 }
