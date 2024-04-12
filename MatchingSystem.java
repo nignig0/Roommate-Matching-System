@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
 
+
 public class MatchingSystem {
     private ArrayList<Student> students; // we don't know how many students are in the file
     private Hostel[] hostels;
@@ -140,10 +141,82 @@ public class MatchingSystem {
         for(int i = 0; i<pairs.size(); ++i){
 
             Student s = pairs.get(i).getKey();
-            Student t = pairs.get(i).getValue();
+            if(s.hasRoom()) continue;
+
+            Map.Entry<Student, Student> bestMatchedPair = null;
+            int score = 100;
 
             for(int j  = i+1; j<pairs.size(); ++j){
                 Student a = pairs.get(j).getValue();
+                if(a.hasRoom()) continue;
+                int matchScore = calculateMatchScore(s, a);
+                if(matchScore < score){
+                    score = matchScore;
+                    bestMatchedPair = pairs.get(j);
+                }
+            }
+            //we've gotten the matched pair now
+            //let's put them in a room
+            if(bestMatchedPair == null) findQuadrupleRoom(pairs.get(i), bestMatchedPair);
+            findQuadrupleRoom(bestMatchedPair, pairs.get(i));
+
+        }
+    }
+
+    private void findQuadrupleRoom(Map.Entry<Student, Student> pair1, Map.Entry<Student, Student> pair2){
+        Student s = pair1.getKey();
+        Student t = pair1.getValue();
+        Student a = (pair2 == null)? null: pair2.getKey();
+        Student b = (pair2 == null)? null: pair2.getValue();
+
+        for(int i = 0; i<hostels.length; i++){
+            // they want to be on campus but the hostel is an off campus hostel
+            if(s.getOffCampusOrOn().ordinal() == 0 && hostels[i].isOffCampus()) continue;
+
+            // they want to be off campus and the hostel is onn campus
+            if(s.getOffCampusOrOn().ordinal() == 2 && !hostels[i].isOffCampus()) continue;
+            Room[][] rooms = hostels[i].getRooms();
+
+            for(int j = 0; j<rooms.length; j++){
+
+                boolean foundRoom = false;
+
+                for(int k = 0; k<rooms[k].length; k++){
+                    if(rooms[j][k] instanceof QuadrupleRoom && rooms[j][k].isEmpty()){
+                        Room room = rooms[j][k];
+                        room.addOccupant(s); s.setRoomed();
+                        room.addOccupant(t); t.setRoomed();
+                        room.addOccupant(a); a.setRoomed();
+                        room.addOccupant(b); b.setRoomed();
+                        foundRoom = true;
+                        break;
+                    }
+                }
+                if(foundRoom) break;
+            }
+        }
+    }
+
+    private void matchTheUnmatched(){
+        for(int i = 0; i< students.size(); i++){
+            if(students.get(i).hasRoom()) continue;
+            Student s = students.get(i);
+
+            for(int j = 0; j<hostels.length; j++){
+                // they want to be on campus but the hostel is an off campus hostel
+                if(s.getOffCampusOrOn().ordinal() == 0 && hostels[j].isOffCampus()) continue;
+
+                // they want to be off campus and the hostel is onn campus
+                if(s.getOffCampusOrOn().ordinal() == 2 && !hostels[j].isOffCampus()) continue;
+
+                Room[][] rooms = hostels[i].getRooms();
+                for(int a = 0; a<rooms.length; a++){
+                    for(int b = 0; b<rooms[a].length; b++){
+                        Room room = rooms[a][b];
+                        if(room.isFull()) continue;
+                        room.addOccupant(s); //this is lazy
+                    }
+                }
             }
         }
     }
@@ -154,6 +227,8 @@ public class MatchingSystem {
         matchSingleStudents();
         matchDoubleStudents();
         handleMatchedPairs();
+        matchQuads();
+        matchTheUnmatched();
     }
 
     public void displayMatches() {

@@ -65,4 +65,8 @@ abstract public class Room {
     public boolean isEmpty(){
         return getNumOccupants() == 0;
     }
+
+    public boolean isFull(){
+        return getNumOccupants() == getNumBeds();
+    }
 }
