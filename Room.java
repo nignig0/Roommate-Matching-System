@@ -61,4 +61,8 @@ abstract public class Room {
         }
         return numOccupants;
     }
+
+    public boolean isEmpty(){
+        return getNumOccupants() == 0;
+    }
 }

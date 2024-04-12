@@ -44,4 +44,8 @@ public class Hostel{
         return freeBeds;
     }
 
+    public boolean isOffCampus(){
+        return this.offCampus;
+    }
+
 }

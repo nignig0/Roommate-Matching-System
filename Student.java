@@ -17,6 +17,7 @@ public class Student {
     private Preference howMuchPersonalSpace;
     private Preference offCampusOrOn;
     private boolean matched;
+    private boolean roomed;
 
     public Student(String id, String gender, String email, int likesLoudMusic, int likesHavingPeopleOver,
                 int sleepsDeeply, int likesTidySpace, int likesToSleepWithLightsOff, int howMuchPersonalSpace,
@@ -34,6 +35,7 @@ public class Student {
                     this.offCampusOrOn = Preference.values()[offCampusOrOn];
                     
                     matched = false;
+                    roomed = false;
 
     }
 
@@ -73,20 +75,32 @@ public class Student {
         return this.offCampusOrOn;
     }
 
-    public void toggleMatched(){
+    public void setMatched(){
         this.matched = !matched;
     }
 
+    public boolean isMatched(){
+        return matched;
+    }
+
+    public void setRoomed(){
+        this.roomed = !roomed;
+    }
+
+    public boolean hasRoom(){
+        return roomed;
+    }
+
     public int[] getPreferenceArray(){
-        return {
+        int[] preferenceArray = {
         this.likesLoudMusic.ordinal(), 
         this.likesHavingPeopleOver.ordinal(),
         this.sleepsDeeply.ordinal(), 
         this.likesTidySpace.ordinal(),
-        this.likesToSleepWithLightsOff.ordinal(), 
         this.howMuchPersonalSpace.ordinal(),
         this.offCampusOrOn.ordinal()
         };
+        return preferenceArray;
     }
  
     public String toString(){

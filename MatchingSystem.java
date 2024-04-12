@@ -1,19 +1,159 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Scanner;
 
 public class MatchingSystem {
     private ArrayList<Student> students; // we don't know how many students are in the file
     private Hostel[] hostels;
+    ArrayList<Map.Entry<Student, Student>> pairs;
 
     public MatchingSystem() {
+        students = new ArrayList<>();
+        pairs  = new ArrayList<>();
         getStudents();
         initHostels();
     }
 
+    private void matchSingleStudents(){
+        ArrayList<Student> singleStudents = new ArrayList<Student>();
+
+        for(int i = 0; i<students.size();++i){
+            Student s = students.get(i);
+
+            if((s.getHowMuchPersonalSpace().ordinal() == 2 
+            || s.getHowMuchPersonalSpace().ordinal()  == 1 )
+            && 
+            (s.getOffCampusOrOn().ordinal() == 2 
+            || s.getOffCampusOrOn().ordinal() == 1)){
+                    singleStudents.add(s);
+                }
+        }
+
+        int studCounter = 0;
+        for(int i = 0; i<hostels.length; ++i){
+
+            if(!hostels[i].isOffCampus()) continue;
+
+            Room[][] rooms = hostels[i].getRooms();
+            
+            for(int j = 0; j<rooms.length; ++j){
+                for(int k = 0; k<rooms[j].length; ++k){
+
+                    /*loop all the rooms in the off campus hostel
+                    assign the students who want to be off campus and valye
+                    personal space to the free rooms
+                    */
+                    if(rooms[j][k] instanceof SingleRoom){
+                        rooms[j][k].addOccupant(singleStudents.get(studCounter));
+                        singleStudents.get(studCounter).setMatched();
+                        singleStudents.get(studCounter).setRoomed();
+                        studCounter++;
+                        if(studCounter == singleStudents.size()) return;
+                    }
+                }
+            }
+
+        }
+    }
+
+    private int calculateMatchScore(Student s, Student t){
+        int[] sPrefArray = s.getPreferenceArray();
+        int[] tPrefArray = t.getPreferenceArray();
+        int score = 0;
+        
+        for(int i = 0; i<sPrefArray.length; ++i){
+            score+= Math.abs(sPrefArray[i] - tPrefArray[i]);
+        }
+        return score;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void matchDoubleStudents(){
+        //calculate everyone's best matches first 
+        for(int i = 0;  i<students.size(); ++i){
+            int score = 100;
+            Student s = students.get(i);
+            Student bestMatch = null;
+
+            if(s.isMatched() || s.hasRoom()) continue;
+            for(int j = i+1; i<students.size(); ++j){
+                Student t = students.get(j);
+                if(t.isMatched() || t.hasRoom()) continue;
+
+                int matchScore = calculateMatchScore(s, t);
+                if(matchScore < score){
+                    bestMatch = t;
+                    score = matchScore;
+                }
+            }
+
+            //at this point we have the best match 
+            bestMatch.setMatched();
+            s.setMatched();
+            pairs.add(new AbstractMap.SimpleEntry(s, bestMatch));
+
+        }
+    }
+
+    private void handleMatchedPairs(){
+        for(int i = 0; i<pairs.size(); ++i){
+            Student s = pairs.get(i).getKey();
+            Student t = pairs.get(i).getValue();
+
+            for(int j = 0; j< hostels.length; ++j){
+                
+                // they want to be on campus but the hostel is an off campus hostel
+                if(s.getOffCampusOrOn().ordinal() == 0 && hostels[j].isOffCampus()) continue;
+
+                // they want to be off campus and the hostel is onn campus
+                if(s.getOffCampusOrOn().ordinal() == 2 && !hostels[j].isOffCampus()) continue;
+
+                Room[][] rooms = hostels[j].getRooms();
+
+                for(int a = 0; a<rooms.length; a++){
+                    boolean foundRoom = false;
+
+                    for(int b = 0; b<rooms[a].length; b++){
+                        if(rooms[a][b] instanceof DoubleRoom && rooms[a][b].isEmpty()){
+                            rooms[a][b].addOccupant(s);
+                            rooms[a][b].addOccupant(t);
+                            foundRoom = true;
+                            s.setRoomed();
+                            t.setRoomed();
+                            break;
+                        }
+                    }
+
+                    if(foundRoom) break;
+                    
+                }
+
+
+            }
+        }
+    }
+
+    private void matchQuads(){
+        for(int i = 0; i<pairs.size(); ++i){
+
+            Student s = pairs.get(i).getKey();
+            Student t = pairs.get(i).getValue();
+
+            for(int j  = i+1; j<pairs.size(); ++j){
+                Student a = pairs.get(j).getValue();
+            }
+        }
+    }
+
     public void matchStudents() {
         // match students
+        //step one put people in single rooms 
+        matchSingleStudents();
+        matchDoubleStudents();
+        handleMatchedPairs();
     }
 
     public void displayMatches() {
@@ -65,7 +205,6 @@ public class MatchingSystem {
     }
 
     private void getStudents() {
-        students = new ArrayList<>();
         File file = new File("OOP_Project_Form.txt");
         try {
             Scanner sc = new Scanner(file);
