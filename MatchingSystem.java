@@ -213,7 +213,7 @@ public class MatchingSystem {
         for(int i = 0; i< students.size(); i++){
             if(students.get(i).hasRoom()) continue;
             Student s = students.get(i);
-
+            boolean foundRoom = false;
             for(int j = 0; j<hostels.length; j++){
                 // they want to be on campus but the hostel is an off campus hostel
                 if(s.getOffCampusOrOn().ordinal() == 0 && hostels[j].isOffCampus()) continue;
@@ -222,7 +222,7 @@ public class MatchingSystem {
                 if(s.getOffCampusOrOn().ordinal() == 2 && !hostels[j].isOffCampus()) continue;
 
                 Room[][] rooms = hostels[i].getRooms();
-                boolean foundRoom = false;
+                
                 for(int a = 0; a<rooms.length; a++){
                     for(int b = 0; b<rooms[a].length; b++){
                         Room room = rooms[a][b];
@@ -231,13 +231,14 @@ public class MatchingSystem {
                             if(!room.getOccupants()[0].getGender().equals(s.getGender())) continue;
                         }
                         foundRoom = room.addOccupant(s); //this is lazy
-                        System.out.println("set");
+
                         s.setRoomed();
-                        
+                        if(foundRoom) break;
                     }
                     if(foundRoom) break;
                 }
             }
+            if(foundRoom) break;
         }
     }
 
