@@ -15,7 +15,9 @@ public class MatchingSystem {
         students = new ArrayList<>();
         pairs  = new ArrayList<>();
         getStudents();
+        System.out.println("Student objects created!");
         initHostels();
+        System.out.println("Hostel objects created!");
     }
 
     private void matchSingleStudents(){
@@ -35,10 +37,13 @@ public class MatchingSystem {
 
         int studCounter = 0;
         for(int i = 0; i<hostels.length; ++i){
+            if(studCounter == singleStudents.size()) return;
 
             if(!hostels[i].isOffCampus()) continue;
 
             Room[][] rooms = hostels[i].getRooms();
+            
+            //System.out.println(rooms.length);
             
             for(int j = 0; j<rooms.length; ++j){
                 for(int k = 0; k<rooms[j].length; ++k){
@@ -80,9 +85,10 @@ public class MatchingSystem {
             Student bestMatch = null;
 
             if(s.isMatched() || s.hasRoom()) continue;
-            for(int j = i+1; i<students.size(); ++j){
+            for(int j = i+1; j<students.size(); ++j){
                 Student t = students.get(j);
                 if(t.isMatched() || t.hasRoom()) continue;
+                if(!s.getGender().equals(t.getGender())) continue;//opposite genders init
 
                 int matchScore = calculateMatchScore(s, t);
                 if(matchScore < score){
@@ -92,8 +98,10 @@ public class MatchingSystem {
             }
 
             //at this point we have the best match 
-            bestMatch.setMatched();
-            s.setMatched();
+            if(bestMatch!= null){
+                bestMatch.setMatched();
+                s.setMatched();
+            }
             pairs.add(new AbstractMap.SimpleEntry(s, bestMatch));
 
         }
@@ -103,6 +111,7 @@ public class MatchingSystem {
         for(int i = 0; i<pairs.size(); ++i){
             Student s = pairs.get(i).getKey();
             Student t = pairs.get(i).getValue();
+            if(t == null) continue;
 
             for(int j = 0; j< hostels.length; ++j){
                 
@@ -149,6 +158,8 @@ public class MatchingSystem {
             for(int j  = i+1; j<pairs.size(); ++j){
                 Student a = pairs.get(j).getValue();
                 if(a.hasRoom()) continue;
+                if(!s.getGender().equals(a.getGender())) continue; //opposite genders init
+
                 int matchScore = calculateMatchScore(s, a);
                 if(matchScore < score){
                     score = matchScore;
@@ -157,14 +168,14 @@ public class MatchingSystem {
             }
             //we've gotten the matched pair now
             //let's put them in a room
-            if(bestMatchedPair == null) findQuadrupleRoom(pairs.get(i), bestMatchedPair);
-            findQuadrupleRoom(bestMatchedPair, pairs.get(i));
+            findQuadrupleRoom(pairs.get(i), bestMatchedPair);
 
         }
     }
 
     private void findQuadrupleRoom(Map.Entry<Student, Student> pair1, Map.Entry<Student, Student> pair2){
         Student s = pair1.getKey();
+        if(pair1.getValue() == null) return;
         Student t = pair1.getValue();
         Student a = (pair2 == null)? null: pair2.getKey();
         Student b = (pair2 == null)? null: pair2.getValue();
@@ -198,6 +209,7 @@ public class MatchingSystem {
     }
 
     private void matchTheUnmatched(){
+        System.out.println(students.size());
         for(int i = 0; i< students.size(); i++){
             if(students.get(i).hasRoom()) continue;
             Student s = students.get(i);
@@ -210,12 +222,20 @@ public class MatchingSystem {
                 if(s.getOffCampusOrOn().ordinal() == 2 && !hostels[j].isOffCampus()) continue;
 
                 Room[][] rooms = hostels[i].getRooms();
+                boolean foundRoom = false;
                 for(int a = 0; a<rooms.length; a++){
                     for(int b = 0; b<rooms[a].length; b++){
                         Room room = rooms[a][b];
                         if(room.isFull()) continue;
-                        room.addOccupant(s); //this is lazy
+                        if(!room.isEmpty()){
+                            if(!room.getOccupants()[0].getGender().equals(s.getGender())) continue;
+                        }
+                        foundRoom = room.addOccupant(s); //this is lazy
+                        System.out.println("set");
+                        s.setRoomed();
+                        
                     }
+                    if(foundRoom) break;
                 }
             }
         }
@@ -223,12 +243,28 @@ public class MatchingSystem {
 
     public void matchStudents() {
         // match students
-        //step one put people in single rooms 
+        //step one put people in single rooms
+        System.out.println("Matching single students"); 
         matchSingleStudents();
+        System.out.println("Single students matched successfully");
+
+        System.out.println("Matching double students");
         matchDoubleStudents();
+        System.out.println("Matched pairs created");
+
+        System.out.println("Handling matched pairs");
         handleMatchedPairs();
+        System.out.println("Matched pairs handled successfully!");
+
+        System.out.println("Handling the quads");
         matchQuads();
+        System.out.println("Handled quads successfully!");
+
+        System.out.println("Matching the unmatched :(");
         matchTheUnmatched();
+        System.out.println("Matched the unmatched");
+
+        displayMatches();
     }
 
     public void displayMatches() {
@@ -240,7 +276,7 @@ public class MatchingSystem {
     private void initHostels() {
         // do something here to initialize
         // the hostels
-        hostels = new Hostel[4];
+        hostels = new Hostel[1]; //temp change for testing purposes
 
         // Off campus hostels
         final int N_HOS_SINGLE_ROOMS = 4;
@@ -278,7 +314,8 @@ public class MatchingSystem {
 
         }
 
-        hostels[0] = new Hostel("New Hosanna", N_HOS_TOTAL_ROOMS, newHosannaRooms, true, true, true, N_HOS_FLOORS);
+        hostels[0] = new Hostel("New Hosanna", N_HOS_TOTAL_ROOMS, newHosannaRooms, false, true, true, N_HOS_FLOORS);
+       // hostels[1] = new Hostel("New Hosanna On campus", N_HOS_TOTAL_ROOMS, newHosannaRooms, true, true, true, N_HOS_FLOORS);//temp change for Tani test
     }
 
     private void getStudents() {
@@ -308,5 +345,10 @@ public class MatchingSystem {
 
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        MatchingSystem matcher = new MatchingSystem();
+        matcher.matchStudents();
     }
 }

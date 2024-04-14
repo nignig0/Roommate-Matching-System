@@ -23,6 +23,7 @@ abstract public class Room {
     }
 
     public boolean addOccupant(Student student) {
+        if(student == null) return false;
         // Check if the student is already in the room
         for (Student occupant : occupants) {
             if (occupant != null && occupant.getId().equals(student.getId()))
@@ -84,5 +85,6 @@ abstract public class Room {
             }
 
         }
+        System.out.println();
     }
 }

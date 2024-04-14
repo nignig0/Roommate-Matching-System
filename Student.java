@@ -47,6 +47,10 @@ public class Student {
         return this.email;
     }
 
+    public Gender getGender(){
+        return this.gender;
+    }
+
     public Preference getLikesLoudMusic(){
         return this.likesLoudMusic;
     }
