@@ -89,7 +89,7 @@ public class MatchingSystem {
 
             if (s.isMatched() || s.hasRoom())
                 continue;
-            for (int j = i + 1; i < students.size(); ++j) {
+            for (int j = i + 1; j < students.size(); ++j) {
                 Student t = students.get(j);
                 if (t.isMatched() || t.hasRoom())
                     continue;
@@ -236,6 +236,7 @@ public class MatchingSystem {
             Student s = students.get(i);
             boolean foundRoom = false;
             for (int j = 0; j < hostels.length; j++) {
+                
                 // they want to be on campus but the hostel is an off campus hostel
                 if (s.getOffCampusOrOn().ordinal() == 0 && hostels[j].isOffCampus())
                     continue;
@@ -305,7 +306,7 @@ public class MatchingSystem {
     private void initHostels() {
         // do something here to initialize
         // the hostels
-        hostels = new Hostel[4]; // temp change for testing purposes
+        hostels = new Hostel[3]; // temp change for testing purposes
 
         // Off campus hostels
         final int N_HOS_SINGLE_ROOMS = 4;
@@ -335,7 +336,7 @@ public class MatchingSystem {
         final int ON_1_QUAD_ROOMS = 10;
         final int ON_1_FLOORS = 2;
         final int ON_1_TOTAL_ROOMS = ON_1_DOUBLE_ROOMS + ON_1_SINGLE_ROOMS + ON_1_QUAD_ROOMS;
-        final int ON_1_ROOMS_PER_FLOOR = (int) Math.ceilDiv(ON_1_TOTAL_ROOMS, ON_1_FLOORS);
+        final int ON_1_ROOMS_PER_FLOOR = (int) Math.ceil(ON_1_TOTAL_ROOMS/ON_1_FLOORS);
         Room onHos1Rooms[][] = new Room[ON_1_FLOORS][ON_1_ROOMS_PER_FLOOR];
         populateRooms(onHos1Rooms, ON_1_SINGLE_ROOMS, ON_1_DOUBLE_ROOMS, ON_1_QUAD_ROOMS, ON_1_FLOORS);
 
