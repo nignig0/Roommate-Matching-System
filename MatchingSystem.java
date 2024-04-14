@@ -340,6 +340,17 @@ public class MatchingSystem {
         populateRooms(onHos1Rooms, ON_1_SINGLE_ROOMS, ON_1_DOUBLE_ROOMS, ON_1_QUAD_ROOMS, ON_1_FLOORS);
 
         hostels[2] = new Hostel("On Campus 1", ON_1_TOTAL_ROOMS, onHos1Rooms, false, false, false, ON_1_FLOORS);
+
+        final int ON_2_SINGLE_ROOMS = 0;
+        final int ON_2_DOUBLE_ROOMS = 0;
+        final int ON_2_QUAD_ROOMS = 10;
+        final int ON_2_FLOORS = 2;
+        final int ON_2_TOTAL_ROOMS = ON_2_DOUBLE_ROOMS + ON_2_SINGLE_ROOMS + ON_2_QUAD_ROOMS;
+        final int ON_2_ROOMS_PER_FLOOR = ON_2_TOTAL_ROOMS / ON_2_FLOORS;
+        Room onHos2Rooms[][] = new Room[ON_2_FLOORS][ON_2_ROOMS_PER_FLOOR];
+        populateRooms(onHos2Rooms, ON_2_SINGLE_ROOMS, ON_2_DOUBLE_ROOMS, ON_2_QUAD_ROOMS, ON_2_FLOORS);
+
+        hostels[4] = new Hostel("On Campus 2", ON_2_TOTAL_ROOMS, onHos1Rooms, false, false, false, ON_2_FLOORS);
     }
 
     private void populateRooms(Room[][] rooms, int singleRooms, int doubleRooms, int quadRooms, int floors) {
