@@ -9,8 +9,10 @@ public class MatchingSystem {
     private ArrayList<Student> students; // we don't know how many students are in the file
     private Hostel[] hostels;
     ArrayList<Map.Entry<Student, Student>> pairs;
+    String studentFilename;
 
-    public MatchingSystem() {
+    public MatchingSystem(String filename) {
+        studentFilename = filename;
         students = new ArrayList<>();
         pairs = new ArrayList<>();
         getStudents();
@@ -167,6 +169,8 @@ public class MatchingSystem {
 
             for (int j = i + 1; j < pairs.size(); ++j) {
                 Student a = pairs.get(j).getValue();
+                if (a == null)
+                    continue;
                 if (a.hasRoom())
                     continue;
                 if (!s.getGender().equals(a.getGender()))
@@ -207,17 +211,28 @@ public class MatchingSystem {
 
                 boolean foundRoom = false;
 
-                for (int k = 0; k < rooms[k].length; k++) {
+                for (int k = 0; k < rooms[j].length; k++) {
                     if (rooms[j][k] instanceof QuadrupleRoom && rooms[j][k].isEmpty()) {
                         Room room = rooms[j][k];
-                        room.addOccupant(s);
-                        s.setRoomed();
-                        room.addOccupant(t);
-                        t.setRoomed();
-                        room.addOccupant(a);
-                        a.setRoomed();
-                        room.addOccupant(b);
-                        b.setRoomed();
+                        if (s != null) {
+                            room.addOccupant(s);
+                            s.setRoomed();
+                        }
+                        if (t != null) {
+                            room.addOccupant(t);
+                            t.setRoomed();
+
+                        }
+                        if (a != null) {
+                            room.addOccupant(a);
+                            a.setRoomed();
+
+                        }
+                        if (b != null) {
+                            room.addOccupant(b);
+                            b.setRoomed();
+
+                        }
                         foundRoom = true;
                         break;
                     }
@@ -233,10 +248,10 @@ public class MatchingSystem {
         for (int i = 0; i < students.size(); i++) {
             if (students.get(i).hasRoom())
                 continue;
-            Student s = students.get(i);
             boolean foundRoom = false;
             for (int j = 0; j < hostels.length; j++) {
-                
+                Student s = students.get(i);
+
                 // they want to be on campus but the hostel is an off campus hostel
                 if (s.getOffCampusOrOn().ordinal() == 0 && hostels[j].isOffCampus())
                     continue;
@@ -245,10 +260,12 @@ public class MatchingSystem {
                 if (s.getOffCampusOrOn().ordinal() == 2 && !hostels[j].isOffCampus())
                     continue;
 
-                Room[][] rooms = hostels[i].getRooms();
+                Room[][] rooms = hostels[j].getRooms();
 
                 for (int a = 0; a < rooms.length; a++) {
                     for (int b = 0; b < rooms[a].length; b++) {
+                        if (s.hasRoom())
+                            continue;
                         Room room = rooms[a][b];
                         if (room.isFull())
                             continue;
@@ -259,15 +276,15 @@ public class MatchingSystem {
                         foundRoom = room.addOccupant(s); // this is lazy
 
                         s.setRoomed();
-                        if (foundRoom)
-                            break;
+                        // if (foundRoom)
+                        // break;
                     }
-                    if (foundRoom)
-                        break;
+                    // if (foundRoom)
+                    // break;
                 }
             }
-            if (foundRoom)
-                break;
+            // if (foundRoom)
+            // break;
         }
     }
 
@@ -306,10 +323,10 @@ public class MatchingSystem {
     private void initHostels() {
         // do something here to initialize
         // the hostels
-        hostels = new Hostel[3]; // temp change for testing purposes
+        hostels = new Hostel[4]; // temp change for testing purposes
 
         // Off campus hostels
-        final int N_HOS_SINGLE_ROOMS = 4;
+        final int N_HOS_SINGLE_ROOMS = 1;
         final int N_HOS_DOUBLE_ROOMS = 4;
         final int N_HOS_QUAD_ROOMS = 4;
         final int N_HOS_TOTAL_ROOMS = N_HOS_SINGLE_ROOMS + N_HOS_DOUBLE_ROOMS + N_HOS_QUAD_ROOMS;
@@ -320,7 +337,7 @@ public class MatchingSystem {
 
         hostels[0] = new Hostel("New Hosanna", N_HOS_TOTAL_ROOMS, newHosannaRooms, true, true, true, N_HOS_FLOORS);
 
-        final int OFF_2_SINGLE_ROOMS = 2;
+        final int OFF_2_SINGLE_ROOMS = 0;
         final int OFF_2_DOUBLE_ROOMS = 5;
         final int OFF_2_QUAD_ROOMS = 5;
         final int OFF_2_TOTAL_ROOMS = OFF_2_SINGLE_ROOMS + OFF_2_DOUBLE_ROOMS + OFF_2_QUAD_ROOMS;
@@ -336,7 +353,7 @@ public class MatchingSystem {
         final int ON_1_QUAD_ROOMS = 10;
         final int ON_1_FLOORS = 2;
         final int ON_1_TOTAL_ROOMS = ON_1_DOUBLE_ROOMS + ON_1_SINGLE_ROOMS + ON_1_QUAD_ROOMS;
-        final int ON_1_ROOMS_PER_FLOOR = (int) Math.ceil(ON_1_TOTAL_ROOMS/ON_1_FLOORS);
+        final int ON_1_ROOMS_PER_FLOOR = (int) Math.ceil(ON_1_TOTAL_ROOMS / ON_1_FLOORS);
         Room onHos1Rooms[][] = new Room[ON_1_FLOORS][ON_1_ROOMS_PER_FLOOR];
         populateRooms(onHos1Rooms, ON_1_SINGLE_ROOMS, ON_1_DOUBLE_ROOMS, ON_1_QUAD_ROOMS, ON_1_FLOORS);
 
@@ -351,7 +368,7 @@ public class MatchingSystem {
         Room onHos2Rooms[][] = new Room[ON_2_FLOORS][ON_2_ROOMS_PER_FLOOR];
         populateRooms(onHos2Rooms, ON_2_SINGLE_ROOMS, ON_2_DOUBLE_ROOMS, ON_2_QUAD_ROOMS, ON_2_FLOORS);
 
-        hostels[4] = new Hostel("On Campus 2", ON_2_TOTAL_ROOMS, onHos1Rooms, false, false, false, ON_2_FLOORS);
+        hostels[3] = new Hostel("On Campus 2", ON_2_TOTAL_ROOMS, onHos1Rooms, false, false, false, ON_2_FLOORS);
     }
 
     private void populateRooms(Room[][] rooms, int singleRooms, int doubleRooms, int quadRooms, int floors) {
@@ -382,7 +399,7 @@ public class MatchingSystem {
     }
 
     private void getStudents() {
-        File file = new File("OOP_Project_Form.txt");
+        File file = new File(studentFilename);
         try {
             Scanner sc = new Scanner(file);
             while (sc.hasNextLine()) {
@@ -391,16 +408,16 @@ public class MatchingSystem {
 
                 // create the student
                 Student student = new Student(
-                        data[1].substring(1, data[1].length() - 1),
-                        data[3].substring(1, data[3].length() - 1),
-                        data[2].substring(1, data[2].length() - 1),
-                        Integer.parseInt(data[4].substring(1, data[4].length() - 1)),
-                        Integer.parseInt(data[5].substring(1, data[5].length() - 1)),
-                        Integer.parseInt(data[6].substring(1, data[6].length() - 1)),
-                        Integer.parseInt(data[7].substring(1, data[7].length() - 1)),
-                        Integer.parseInt(data[8].substring(1, data[8].length() - 1)),
-                        Integer.parseInt(data[9].substring(1, data[9].length() - 1)),
-                        Integer.parseInt(data[10].substring(1, data[10].length() - 1)));
+                        data[1],
+                        data[3],
+                        data[2],
+                        Integer.parseInt(data[4]),
+                        Integer.parseInt(data[5]),
+                        Integer.parseInt(data[6]),
+                        Integer.parseInt(data[7]),
+                        Integer.parseInt(data[8]),
+                        Integer.parseInt(data[9]),
+                        Integer.parseInt(data[10]));
                 students.add(student);
             }
             sc.close();
@@ -411,7 +428,7 @@ public class MatchingSystem {
     }
 
     public static void main(String[] args) {
-        MatchingSystem matcher = new MatchingSystem();
+        MatchingSystem matcher = new MatchingSystem("OOP Project Form (Responses) - Form responses 1.csv");
         matcher.matchStudents();
     }
 }
