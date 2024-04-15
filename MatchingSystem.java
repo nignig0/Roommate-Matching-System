@@ -75,7 +75,16 @@ public class MatchingSystem {
         int[] tPrefArray = t.getPreferenceArray();
         int score = 0;
 
-        for (int i = 0; i < sPrefArray.length; ++i) {
+        if(s.getOffCampusOrOn().ordinal() == 2 & t.getOffCampusOrOn().ordinal() == 0){
+            return 1000;
+        }
+
+        if(t.getOffCampusOrOn().ordinal() == 2 & s.getOffCampusOrOn().ordinal() == 0){
+            return 1000;
+        }
+
+
+        for (int i = 0; i < sPrefArray.length-1; ++i) {
             score += Math.abs(sPrefArray[i] - tPrefArray[i]);
         }
         return score;
@@ -116,13 +125,18 @@ public class MatchingSystem {
     }
 
     private void handleMatchedPairs() {
+        
         for (int i = 0; i < pairs.size(); ++i) {
+            
             Student s = pairs.get(i).getKey();
             Student t = pairs.get(i).getValue();
-            if (t == null)
-                continue;
+
+            
+            if (t == null) continue;
+            
 
             for (int j = 0; j < hostels.length; ++j) {
+                if(t.hasRoom() && s.hasRoom()) break;
 
                 // they want to be on campus but the hostel is an off campus hostel
                 if (s.getOffCampusOrOn().ordinal() == 0 && hostels[j].isOffCampus())
@@ -135,22 +149,18 @@ public class MatchingSystem {
                 Room[][] rooms = hostels[j].getRooms();
 
                 for (int a = 0; a < rooms.length; a++) {
-                    boolean foundRoom = false;
-
+                    if(t.hasRoom() && s.hasRoom()) break;
                     for (int b = 0; b < rooms[a].length; b++) {
                         if (rooms[a][b] instanceof DoubleRoom && rooms[a][b].isEmpty()) {
                             rooms[a][b].addOccupant(s);
                             rooms[a][b].addOccupant(t);
-                            foundRoom = true;
+                            
                             s.setRoomed();
                             t.setRoomed();
                             break;
+                            
                         }
                     }
-
-                    if (foundRoom)
-                        break;
-
                 }
 
             }
@@ -198,6 +208,7 @@ public class MatchingSystem {
         Student b = (pair2 == null) ? null : pair2.getValue();
 
         for (int i = 0; i < hostels.length; i++) {
+            if(s.hasRoom() && t.hasRoom()) break;
             // they want to be on campus but the hostel is an off campus hostel
             if (s.getOffCampusOrOn().ordinal() == 0 && hostels[i].isOffCampus())
                 continue;
@@ -208,9 +219,7 @@ public class MatchingSystem {
             Room[][] rooms = hostels[i].getRooms();
 
             for (int j = 0; j < rooms.length; j++) {
-
-                boolean foundRoom = false;
-
+                if(s.hasRoom() && t.hasRoom()) break;
                 for (int k = 0; k < rooms[j].length; k++) {
                     if (rooms[j][k] instanceof QuadrupleRoom && rooms[j][k].isEmpty()) {
                         Room room = rooms[j][k];
@@ -233,24 +242,24 @@ public class MatchingSystem {
                             b.setRoomed();
 
                         }
-                        foundRoom = true;
                         break;
                     }
                 }
-                if (foundRoom)
-                    break;
+                
             }
         }
     }
 
     private void matchTheUnmatched() {
-        System.out.println(students.size());
+        
         for (int i = 0; i < students.size(); i++) {
             if (students.get(i).hasRoom())
                 continue;
-            boolean foundRoom = false;
             for (int j = 0; j < hostels.length; j++) {
                 Student s = students.get(i);
+
+                if(s.hasRoom()) break;
+                
 
                 // they want to be on campus but the hostel is an off campus hostel
                 if (s.getOffCampusOrOn().ordinal() == 0 && hostels[j].isOffCampus())
@@ -264,8 +273,7 @@ public class MatchingSystem {
 
                 for (int a = 0; a < rooms.length; a++) {
                     for (int b = 0; b < rooms[a].length; b++) {
-                        if (s.hasRoom())
-                            continue;
+                        if (s.hasRoom()) break;
                         Room room = rooms[a][b];
                         if (room.isFull())
                             continue;
@@ -273,9 +281,9 @@ public class MatchingSystem {
                             if (!room.getOccupants()[0].getGender().equals(s.getGender()))
                                 continue;
                         }
-                        foundRoom = room.addOccupant(s); // this is lazy
-
+                        room.addOccupant(s); // this is lazy
                         s.setRoomed();
+                        System.out.println("You have a room");
                         // if (foundRoom)
                         // break;
                     }
@@ -368,7 +376,7 @@ public class MatchingSystem {
         Room onHos2Rooms[][] = new Room[ON_2_FLOORS][ON_2_ROOMS_PER_FLOOR];
         populateRooms(onHos2Rooms, ON_2_SINGLE_ROOMS, ON_2_DOUBLE_ROOMS, ON_2_QUAD_ROOMS, ON_2_FLOORS);
 
-        hostels[3] = new Hostel("On Campus 2", ON_2_TOTAL_ROOMS, onHos1Rooms, false, false, false, ON_2_FLOORS);
+        hostels[3] = new Hostel("On Campus 2", ON_2_TOTAL_ROOMS, onHos2Rooms, false, false, false, ON_2_FLOORS);
     }
 
     private void populateRooms(Room[][] rooms, int singleRooms, int doubleRooms, int quadRooms, int floors) {
