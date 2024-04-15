@@ -23,7 +23,8 @@ abstract public class Room {
     }
 
     public boolean addOccupant(Student student) {
-        if(student == null) return false;
+        if (student == null)
+            return false;
         // Check if the student is already in the room
         for (Student occupant : occupants) {
             if (occupant != null && occupant.getId().equals(student.getId()))
@@ -63,22 +64,22 @@ abstract public class Room {
         return numOccupants;
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return getNumOccupants() == 0;
     }
 
-    public boolean isFull(){
+    public boolean isFull() {
         return getNumOccupants() == getNumBeds();
     }
 
-    public void display(){
+    public void display() {
         System.out.printf("Room number: %s\n", this.roomNum);
         System.out.println("-----------------");
-        for(int i = 0; i<occupants.length; i++){
-            if(occupants[i] == null){
+        for (int i = 0; i < occupants.length; i++) {
+            if (occupants[i] == null) {
                 System.out.println("Empty bed!");
-            }else{
-                System.out.printf("Bed %d\n", i+1);
+            } else {
+                System.out.printf("Bed %d\n", i + 1);
                 System.out.printf("Student id: %s\n", occupants[i].getId());
                 System.out.printf("Student email: %s\n", occupants[i].getEmail());
                 System.out.println("--------------");
