@@ -452,7 +452,8 @@ public class MatchingSystem {
 
     public static void main(String[] args) {
         try {
-            MatchingSystem matcher = new MatchingSystem("OOP Project Form (Responses) - Form responses 1.csv");
+            String filename = (args.length == 0 )? "OOP Project Form (Responses) - Form responses 1.csv" : args[0];
+            MatchingSystem matcher = new MatchingSystem(filename);
             matcher.matchStudents();
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());

@@ -12,3 +12,7 @@ javac MatchingSystem.java
 
 And is executed using this command:
 java MatchingSystem
+
+OR
+
+java MatchingSystem <filepath>
