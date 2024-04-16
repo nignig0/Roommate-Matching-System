@@ -342,7 +342,7 @@ public class MatchingSystem {
     private void initHostels() {
         // do something here to initialize
         // the hostels
-        hostels = new Hostel[3]; // temp change for testing purposes
+        hostels = new Hostel[4]; // temp change for testing purposes
 
         // Off campus hostels
         final int N_HOS_SINGLE_ROOMS = 1;
@@ -387,8 +387,8 @@ public class MatchingSystem {
         Room onHos2Rooms[][] = new Room[ON_2_FLOORS][ON_2_ROOMS_PER_FLOOR];
         populateRooms(onHos2Rooms, ON_2_SINGLE_ROOMS, ON_2_DOUBLE_ROOMS, ON_2_QUAD_ROOMS, ON_2_FLOORS);
 
-        // hostels[3] = new Hostel("On Campus 2", ON_2_TOTAL_ROOMS, onHos2Rooms, false,
-        // false, false, ON_2_FLOORS);
+        hostels[3] = new Hostel("On Campus 2", ON_2_TOTAL_ROOMS, onHos2Rooms, false,
+                false, false, ON_2_FLOORS);
     }
 
     private void populateRooms(Room[][] rooms, int singleRooms, int doubleRooms, int quadRooms, int floors) {

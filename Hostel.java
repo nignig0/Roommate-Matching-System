@@ -20,16 +20,12 @@ public class Hostel {
         return name;
     }
 
-    public int getnumRooms() {
+    public int getNumRooms() {
         return numRooms;
     }
 
     public Room[][] getRooms() {
         return rooms;
-    }
-
-    public boolean offCampus() {
-        return offCampus;
     }
 
     public int numFloors() {
