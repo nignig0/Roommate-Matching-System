@@ -1,7 +1,7 @@
 public class Hostel {
     // Declaring the instance variables of the hostel class
     private String name;
-    private int numRooms; // rooms per floor
+    private int numRooms; // total number of rooms in the hostel
     private Room[][] rooms;
     private boolean offCampus;
     private int numFloors;
@@ -16,36 +16,44 @@ public class Hostel {
         this.numFloors = numFloors;
     }
 
+    /**
+     * @return returns the name of the hostel
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return returns the number of rooms in the hostel
+     */
     public int getNumRooms() {
         return numRooms;
     }
 
+    /**
+     * @return returns the  rooms in the hostel
+     */
     public Room[][] getRooms() {
         return rooms;
     }
 
+    /**
+     * @return returns the number of floors in the hostel
+     */
     public int numFloors() {
         return numFloors;
     }
 
-    public int getNumFreeBeds() {
-        int freeBeds = 0;
-        for (int i = 0; i < rooms.length; ++i) {
-            for (int j = 0; j < rooms[i].length; ++j) {
-                freeBeds += rooms[i][j].getNumBeds() - rooms[i][j].getNumOccupants();
-            }
-        }
-        return freeBeds;
-    }
-
+    /**
+     * @return returns true if the campus is off campus
+     */
     public boolean isOffCampus() {
         return this.offCampus;
     }
 
+    /**
+     * helper method to help display rooms
+     */
     public void displayRooms() {
         System.out.printf("Hostel name: %s\n", name);
         System.out.printf("Number of rooms: %d\n", numRooms);

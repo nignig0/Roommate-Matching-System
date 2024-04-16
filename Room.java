@@ -9,19 +9,36 @@ abstract public class Room {
         occupants = new Student[numBeds];
     }
 
+    /**
+     * gets the number of beds
+     * @return returns the number of beds
+     */
     public int getNumBeds() {
         return numBeds;
     }
 
+    /**
+     * 
+     * @return returns the occupants of the room
+     */
     public Student[] getOccupants() {
         // For immutable access to the occupants array
         return occupants.clone();
     }
 
+    /**
+     * 
+     * @return returns the room number 
+     */
     public String getRoomNum() {
         return roomNum;
     }
 
+    /**
+     * adds a student to a room
+     * @param student
+     * @return returns true if this was done successfully and false otherwise
+     */
     public boolean addOccupant(Student student) {
         if (student == null)
             return false;
@@ -45,6 +62,11 @@ abstract public class Room {
         return false;
     }
 
+    /**
+     * removes an occupant from a room
+     * @param student
+     * @return returns true if this was done successfully and false otherwise
+     */
     public boolean removeOccupant(Student student) {
         for (int i = 0; i < numBeds; i++) {
             if (occupants[i] != null && student.getId().equals(occupants[i].getId())) {
@@ -55,6 +77,10 @@ abstract public class Room {
         return false;
     }
 
+    /**
+     * 
+     * @return returns the current number of occupants of the room
+     */
     public int getNumOccupants() {
         int numOccupants = 0;
         for (int i = 0; i < occupants.length; ++i) {
@@ -64,14 +90,24 @@ abstract public class Room {
         return numOccupants;
     }
 
+    /**
+     * 
+     * @return returns true if the room is empty and false otherwise
+     */
     public boolean isEmpty() {
         return getNumOccupants() == 0;
     }
 
+    /**
+     * @return returns true if the room is true and false otherwise 
+     */
     public boolean isFull() {
         return getNumOccupants() == getNumBeds();
     }
 
+    /**
+     * helper method to display rooms
+     */
     public void display() {
         System.out.printf("Room number: %s\n", this.roomNum);
         System.out.println("-----------------");

@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -22,6 +21,12 @@ public class MatchingSystem {
         System.out.println("Hostel objects created!");
     }
 
+    /**
+     * Matches single students 
+     * Single students are students who want to stay off campus
+     * And require lots of personal space
+     * We assign them to single rooms off campus
+     */
     private void matchSingleStudents() {
         ArrayList<Student> singleStudents = new ArrayList<Student>();
 
@@ -33,11 +38,22 @@ public class MatchingSystem {
                     &&
                     (s.getOffCampusOrOn().ordinal() == 2
                             || s.getOffCampusOrOn().ordinal() == 1)) {
+                
+                /*
+                 * If the student wants has a medium to high preference for personal space 
+                 * And the student wants to be off campus or is indifferent
+                 */
+
                 singleStudents.add(s);
             }
         }
 
-        int studCounter = 0;
+        /*
+         * The rest of the code is basically looping through all single students
+         * and assigning them to the available single rooms
+         */
+
+        int studCounter = 0; 
         for (int i = 0; i < hostels.length; ++i) {
             if (studCounter == singleStudents.size())
                 return;
@@ -73,10 +89,22 @@ public class MatchingSystem {
         }
     }
 
+    /**
+     * Calculates the match score for two students 
+     * The match score is how well two students fit each other
+     * A low match score means two students are well suited to each other 
+     * @param s student 1
+     * @param t student 2
+     * @return returns the match score
+     */
     private int calculateMatchScore(Student s, Student t) {
         int[] sPrefArray = s.getPreferenceArray();
         int[] tPrefArray = t.getPreferenceArray();
         int score = 0;
+
+        //if one of the students wants to be off campus and the other wants to be on
+        //then they can't be roommates 
+        //Incompatible!
 
         if (s.getOffCampusOrOn().ordinal() == 2 & t.getOffCampusOrOn().ordinal() == 0) {
             return 1000;
@@ -92,6 +120,12 @@ public class MatchingSystem {
         return score;
     }
 
+
+    /**
+     * Creates pairs (x,y) of every student x and their best available match y
+     * Important to note that there could be a pair (x, null)
+     * If we have an odd number of students
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void matchDoubleStudents() {
         // calculate everyone's best matches first
@@ -100,14 +134,15 @@ public class MatchingSystem {
             Student s = students.get(i);
             Student bestMatch = null;
 
-            if (s.isMatched() || s.hasRoom())
-                continue;
+            //if this student has a room or has been matched already, ignore them. Move on.
+            if (s.isMatched() || s.hasRoom()) continue;
+
             for (int j = i + 1; j < students.size(); ++j) {
                 Student t = students.get(j);
-                if (t.isMatched() || t.hasRoom())
-                    continue;
-                if (!s.getGender().equals(t.getGender()))
-                    continue;// opposite genders init
+
+                if (t.isMatched() || t.hasRoom()) continue;
+
+                if (!s.getGender().equals(t.getGender())) continue;// opposite genders init
 
                 int matchScore = calculateMatchScore(s, t);
                 if (matchScore < score) {
@@ -122,10 +157,13 @@ public class MatchingSystem {
                 s.setMatched();
             }
             pairs.add(new AbstractMap.SimpleEntry(s, bestMatch));
-
+            //adding the pairs
         }
     }
 
+    /**
+     * Assigns each pair (x,y) to available double rooms
+     */
     private void handleMatchedPairs() {
 
         for (int i = 0; i < pairs.size(); ++i) {
@@ -133,12 +171,10 @@ public class MatchingSystem {
             Student s = pairs.get(i).getKey();
             Student t = pairs.get(i).getValue();
 
-            if (t == null)
-                continue;
+            if (t == null) continue; //if the second student in the pair is null, move on,
 
             for (int j = 0; j < hostels.length; ++j) {
-                if (t.hasRoom() && s.hasRoom())
-                    break;
+                if (t.hasRoom() && s.hasRoom()) break; //if both students have been assigned a room, end this loop
 
                 // they want to be on campus but the hostel is an off campus hostel
                 if (s.getOffCampusOrOn().ordinal() == 0 && hostels[j].isOffCampus())
@@ -151,10 +187,14 @@ public class MatchingSystem {
                 Room[][] rooms = hostels[j].getRooms();
 
                 for (int a = 0; a < rooms.length; a++) {
-                    if (t.hasRoom() && s.hasRoom())
-                        break;
+
+                    //end the students have been assigned rooms
+                    if (t.hasRoom() && s.hasRoom()) break;
+
                     for (int b = 0; b < rooms[a].length; b++) {
+
                         if (rooms[a][b] instanceof DoubleRoom && rooms[a][b].isEmpty()) {
+                            //if we have a free double room
                             if (rooms[a][b].addOccupant(s)) {
                                 s.setRoomed();
                             }
@@ -164,7 +204,6 @@ public class MatchingSystem {
                             }
 
                             break;
-
                         }
                     }
                 }
@@ -172,6 +211,10 @@ public class MatchingSystem {
             }
         }
     }
+
+    /**
+     * For every pair (x,y), finds the pair (a,b) that is most compatible with them
+     */
 
     private void matchQuads() {
         for (int i = 0; i < pairs.size(); ++i) {
@@ -184,13 +227,11 @@ public class MatchingSystem {
             int score = 100;
 
             for (int j = i + 1; j < pairs.size(); ++j) {
-                Student a = pairs.get(j).getValue();
-                if (a == null)
-                    continue;
-                if (a.hasRoom())
-                    continue;
-                if (!s.getGender().equals(a.getGender()))
-                    continue; // opposite genders init
+                Student a = pairs.get(j).getValue(); //could be the key here as well
+                
+                if (a == null) continue;
+                if (a.hasRoom()) continue;
+                if (!s.getGender().equals(a.getGender())) continue; // opposite genders init
 
                 int matchScore = calculateMatchScore(s, a);
                 if (matchScore < score) {
@@ -205,17 +246,26 @@ public class MatchingSystem {
         }
     }
 
+    /**
+     * Puts pairs (x,y) and (a,b) in a double room
+     * @param pair1
+     * @param pair2
+     */
+
     private void findQuadrupleRoom(Map.Entry<Student, Student> pair1, Map.Entry<Student, Student> pair2) {
         Student s = pair1.getKey();
-        if (pair1.getValue() == null)
-            return;
+
+        if (pair1.getValue() == null) return;
+
         Student t = pair1.getValue();
+
         Student a = (pair2 == null) ? null : pair2.getKey();
         Student b = (pair2 == null) ? null : pair2.getValue();
 
+        //finding a room for the pairs 
         for (int i = 0; i < hostels.length; i++) {
-            if (s.hasRoom() && t.hasRoom())
-                break;
+            
+            if (s.hasRoom() && t.hasRoom()) break;
             // they want to be on campus but the hostel is an off campus hostel
             if (s.getOffCampusOrOn().ordinal() == 0 && hostels[i].isOffCampus())
                 continue;
@@ -226,8 +276,14 @@ public class MatchingSystem {
             Room[][] rooms = hostels[i].getRooms();
 
             for (int j = 0; j < rooms.length; j++) {
-                if (s.hasRoom() && t.hasRoom())
-                    break;
+                
+                //if the first pair have rooms, then we can break
+                //as the other pair might be (null, null)
+                //We could check that...
+                //trying to keep the code pretty simple
+
+                if (s.hasRoom() && t.hasRoom()) break;
+
                 for (int k = 0; k < rooms[j].length; k++) {
                     if (rooms[j][k] instanceof QuadrupleRoom && rooms[j][k].isEmpty()) {
                         Room room = rooms[j][k];
@@ -256,6 +312,10 @@ public class MatchingSystem {
         }
     }
 
+    /**
+     * If a student hasn't been matched, we put them in a room
+     */
+
     private void matchTheUnmatched() {
 
         for (int i = 0; i < students.size(); i++) {
@@ -282,8 +342,7 @@ public class MatchingSystem {
                         if (s.hasRoom())
                             break;
                         Room room = rooms[a][b];
-                        if (room.isFull())
-                            continue;
+                        if (room.isFull())  continue;
                         if (!room.isEmpty()) {
                             if (!room.getOccupants()[0].getGender().equals(s.getGender()))
                                 continue;
@@ -340,8 +399,6 @@ public class MatchingSystem {
     }
 
     private void initHostels() {
-        // do something here to initialize
-        // the hostels
         hostels = new Hostel[4]; // temp change for testing purposes
 
         // Off campus hostels
