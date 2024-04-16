@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
@@ -11,7 +12,7 @@ public class MatchingSystem {
     ArrayList<Map.Entry<Student, Student>> pairs;
     String studentFilename;
 
-    public MatchingSystem(String filename) {
+    public MatchingSystem(String filename) throws IOException {
         studentFilename = filename;
         students = new ArrayList<>();
         pairs = new ArrayList<>();
@@ -296,6 +297,8 @@ public class MatchingSystem {
     }
 
     public void matchStudents() {
+        System.out.printf("Welcome to The Roommate Matching System, currently reading from file:\n%s\n",
+                studentFilename);
         // match students
         // step one put people in single rooms
         System.out.println("Matching single students");
@@ -415,10 +418,11 @@ public class MatchingSystem {
         }
     }
 
-    private void getStudents() {
+    private void getStudents() throws IOException {
         File file = new File(studentFilename);
+        Scanner sc = null;
         try {
-            Scanner sc = new Scanner(file);
+            sc = new Scanner(file);
             while (sc.hasNextLine()) {
                 // read the student data from the csv file
                 String[] data = sc.nextLine().split(",");
@@ -438,14 +442,20 @@ public class MatchingSystem {
                 students.add(student);
             }
             sc.close();
-        } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (sc != null)
+                sc.close();
         }
     }
 
     public static void main(String[] args) {
-        MatchingSystem matcher = new MatchingSystem("OOP Project Form (Responses) - Form responses 1.csv");
-        matcher.matchStudents();
+        try {
+            MatchingSystem matcher = new MatchingSystem("OOP Project Form (Responses) - Form responses 1.csv");
+            matcher.matchStudents();
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
